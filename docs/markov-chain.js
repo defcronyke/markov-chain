@@ -112,6 +112,30 @@ function words(inputText) {
 	return arr2;
 }
 
+function startingWords(wds) {
+	if (!wds) {
+		return;
+	}
+
+	const arr = wds.filter(function (val) {
+		return /[A-Z]/g.test(val[0]);
+	});
+
+	return arr;
+}
+
+function endingWords(wds) {
+	if (!wds) {
+		return;
+	}
+
+	const arr = wds.filter(function (val) {
+		return /\.\!\?/g.test(val[val.length - 1]);
+	});
+
+	return arr;
+}
+
 function wordOccurrences(wds, wordCount, wordOccurrencesEl, clearEls, done, context) {
 	if (!wds) {
 		return;
@@ -212,6 +236,11 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 		return;
 	}
 
+	const startingWds = startingWords(wds) || [wds[getRandomInt(0, wds.length - 1)]];
+	if (!startingWds) {
+		return;
+	}
+
 	const wordCount = wds.length;
 	if (!wordCount) {
 		return;
@@ -222,7 +251,8 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 		return;
 	}
 
-	var randomWord = wds[getRandomInt(0, wds.length - 1)];
+	// Start a sentence.
+	var randomWord = startingWds[getRandomInt(0, startingWds.length - 1)];
 
 	var outputText = randomWord;
 
@@ -234,6 +264,15 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 	const outputNumWords = outputNumWordsEl.value || 50;
 
 	for (var i = 0; i < (outputNumWords - 1); i++) {
+		const markovWords = getMarkovWords(wds, randomWord);
+
+		randomWord = markovWords[getRandomInt(0, markovWords.length - 1)];
+
+		outputText += ' ' + randomWord;
+	}
+
+	// End the last sentence.
+	while (!/[\.\!\?]/g.test(randomWord[randomWord.length - 1])) {
 		const markovWords = getMarkovWords(wds, randomWord);
 
 		randomWord = markovWords[getRandomInt(0, markovWords.length - 1)];
