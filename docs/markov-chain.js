@@ -307,11 +307,12 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 	}
 
 	bookButton.addEventListener('click', function () {
+		const baseURL = 'https://defcronyke.github.io/markov-chain/';
 		const textDir = 'text/';
 		const book = 'alices-adventures-in-wonderland-by-lewis-carroll-gutenberg.txt';
-		const path = textDir + book;
+		const url = baseURL + textDir + book;
 
-		fetch(path)
+		fetch(url)
 			.then(function (res) {
 				return res.text();
 			})
@@ -322,6 +323,8 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 				}
 
 				inputTextEl.value = res;
+
+				return res;
 			})
 			.catch(function (err) {
 				console.log('error: Failed fetching book: ' + path);
