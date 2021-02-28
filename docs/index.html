@@ -1,45 +1,48 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Markov Chain</title>
-	</head>
 
-	<body>
-		<h1>Markov Chain</h1>
+<head>
+	<title>Markov Chain</title>
+</head>
 
-		<div>
-			<h3>Input Text:</h3>
-			<p><textarea id="input-text" style="width: 50%; height: 10em;"></textarea></p>
-		</div>
+<body>
+	<h1>Markov Chain</h1>
 
-		<div>
-			<p>
-				<button id="generate-button">Generate</button> &nbsp;
-				<button id="clear-button">Clear</button>
-			</p>
-		</div>
+	<div>
+		<h3>Input Text:</h3>
+		<p><textarea id="input-text" style="width: 50em; height: 10em; padding: 1em;"></textarea></p>
+	</div>
 
-		<div>
-			<h3>Output Text:</h3>
-			<p><textarea id="output-text" style="width: 50%; height: 10em;" readonly></textarea></p>
-		</div>
+	<div>
+		<h3>Number of Output Words:</h3>
+		<p><input type="number" id="output-num-words" style="width: 50em; padding: 1em;" min="1" value="50"></p>
+	</div>
 
-		<div>
+	<div>
+		<p>
+			<button id="generate-button" style="padding: 1em;">Generate</button> &nbsp;
+			<button id="clear-button" style="padding: 1em;">Clear</button> &nbsp; &nbsp;
+			<label for="enable-stats">Enable Stats: </label>
+			<input type="checkbox" id="enable-stats" style="position:relative; width: 2em; height: 2em; margin: 1em; top: 0.5em;" min="1" value="50"> &nbsp; &nbsp;
+			<button id="book-button" style="padding: 1em;">Use a Free Book</button>
+		</p>
+	</div>
 
-			<h3>Stats:</h3>
+	<div>
+		<h3>Output Text:</h3>
+		<p><textarea id="output-text" style="width: 50em; height: 10em; padding: 1em;" readonly></textarea></p>
+	</div>
 
-			<p>
-				<h4 style="display: inline-block; margin: 0px;">Number of words: </h4>
-				<span id="num-words">0</span>
-			</p>
+	<div>
 
-			<p>
-				<h4 style="display: inline-block; margin: 0px;">Number of word occurrences: </h4>
-				<pre id="word-occurrences">{}</pre>
-			</p>
+		<h3>Stats:</h3>
+		<p>
+		<pre id="word-occurrences">{}</pre>
+		</p>
 
-		</div>
+	</div>
 
-		<script src="markov-chain.js"></script>
-	</body>
+	<script src="markov-chain.js"></script>
+</body>
+
 </html>

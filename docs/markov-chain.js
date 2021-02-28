@@ -1,10 +1,18 @@
+// getRandomInt is borrowed from here:
+// https://stackoverflow.com/a/1527820
+function getRandomInt(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 // processLargeArrayAsync is borrowed and slightly modified from here:
 // https://stackoverflow.com/a/10344560
 function processLargeArrayAsync(array, fn, done, maxTimePerChunk, context) {
 	context = context || window;
 	maxTimePerChunk = maxTimePerChunk || 200;
 	var index = 0;
-	
+
 	function now() {
 		return new Date().getTime();
 	}
@@ -12,29 +20,29 @@ function processLargeArrayAsync(array, fn, done, maxTimePerChunk, context) {
 	console.log('!!!!!! STARTED PROCESS !!!!!!!!');
 
 	function doChunk() {
-			var startTime = now();
+		const startTime = now();
 
-			console.log('!!!!!! STARTED CHUNK !!!!!!!!');
+		console.log('!!!!!! STARTED CHUNK !!!!!!!!');
 
-			while (index < array.length && (now() - startTime) <= maxTimePerChunk) {
-					// callback called with args (value, index, array)
-					fn.call(context, array[index], index, array);
-					++index;
-			}
-			if (index < array.length) {
-				console.log('!!!!!! FINISHED CHUNK !!!!!!!!');
-					// set Timeout for async iteration
-					window.setTimeout(doChunk, 1);
-					return;
-			}
+		while (index < array.length && (now() - startTime) <= maxTimePerChunk) {
+			// callback called with args (value, index, array)
+			fn.call(context, array[index], index, array);
+			++index;
+		}
+		if (index < array.length) {
+			console.log('!!!!!! FINISHED CHUNK !!!!!!!!');
+			// set Timeout for async iteration
+			window.setTimeout(doChunk, 1);
+			return;
+		}
 
-			done.call(context);
-	}    
-	doChunk();    
+		done.call(context);
+	}
+	doChunk();
 }
 
 function clear(els) {
-	if (!els || !els.innerText || !els.value) {
+	if (!els || (!els.innerText && !els.value)) {
 		return;
 	}
 
@@ -74,6 +82,19 @@ function addInnerText(el, val, clearEls) {
 	clearEls.innerText.push(el);
 }
 
+function addValue(el, val, clearEls) {
+	if (!el || !val || !clearEls) {
+		return;
+	}
+
+	if (!('defaultVal' in el)) {
+		el.defaultVal = el.value;
+	}
+
+	el.value = val;
+	clearEls.value.push(el);
+}
+
 function words(inputText) {
 	if (!inputText) {
 		return;
@@ -84,27 +105,30 @@ function words(inputText) {
 		return;
 	}
 
-	const arr2 = arr.filter(function(val) {
+	const arr2 = arr.filter(function (val) {
 		return val !== '';
 	});
 
 	return arr2;
 }
 
-function wordOccurrences(wds, wordCount, wordOccurrencesEl, clearEls) {
+function wordOccurrences(wds, wordCount, wordOccurrencesEl, clearEls, done, context) {
 	if (!wds) {
 		return;
 	}
 
+	context = context || window;
+
 	console.log('!!!!!! STARTED !!!!!!!!');
 
 	const arr = [];
-	const obj = {};
+	const occObj = {};
+	const probObj = {};
 
-	window.setTimeout(function() {
-		processLargeArrayAsync(wds, 
-			function(word) {
-				const item = (arr.find(function(val) {
+	window.setTimeout(function () {
+		processLargeArrayAsync(wds,
+			function (word) {
+				const item = (arr.find(function (val) {
 					if (val.word === word) {
 						val.occurrences++;
 						val.probability = val.occurrences / wordCount;
@@ -119,28 +143,30 @@ function wordOccurrences(wds, wordCount, wordOccurrencesEl, clearEls) {
 					arr.push(item);
 				}
 
-				if (word in obj) {
-					obj[word]++;
+				if (word in occObj) {
+					occObj[word]++;
+					probObj[word] = occObj[word] / wordCount;
 					return;
 				}
 
-				obj[word] = 1;
+				occObj[word] = 1;
+				probObj[word] = 1 / wordCount;
 			},
 
-			function() {
+			function () {
 				console.log('!!!!!! SORTING !!!!!!!!');
 
-				arr.sort(function(a, b) {
+				arr.sort(function (a, b) {
 					const sort1 = b.occurrences - a.occurrences;
-		
+
 					if (sort1 === 0) {
 						return a.word.toLowerCase() < b.word.toLowerCase() ? -1 : 1;
 					}
-		
+
 					return sort1;
 				});
 
-				const res = {'number_of_words': wordCount, 'sorted': arr, 'lookup': obj};
+				const res = { 'number_of_words': wordCount, 'sorted': arr, 'occurrences': occObj, 'probabilities': probObj };
 
 				console.log('!!!!!! MAKING JSON !!!!!!!!');
 
@@ -151,6 +177,8 @@ function wordOccurrences(wds, wordCount, wordOccurrencesEl, clearEls) {
 				addInnerText(wordOccurrencesEl, wordOccurrencesJSON, clearEls);
 
 				console.log('!!!!!! ASYNC DONE !!!!!!!!');
+
+				done.call(context);
 			}
 		);
 
@@ -159,10 +187,25 @@ function wordOccurrences(wds, wordCount, wordOccurrencesEl, clearEls) {
 	return true;
 }
 
-function markovChain(inputText, outputTextEl, clearEls) {
-	if (!inputText || !clearEls) {
+function getMarkovWords(wds, inWord) {
+	const nextWords = wds
+		.filter(function (val, idx, arr) {
+			if (idx === 0) {
+				return val === inWord;
+			}
+
+			return arr[idx - 1] === inWord;
+		});
+
+	return nextWords || [];
+}
+
+function markovChain(inputText, outputTextEl, clearEls, done, context) {
+	if (!inputText || !outputTextEl || !clearEls) {
 		return;
 	}
+
+	context = context || window;
 
 	const wds = words(inputText);
 	if (!wds) {
@@ -174,43 +217,69 @@ function markovChain(inputText, outputTextEl, clearEls) {
 		return;
 	}
 
-	console.log('word count: ' + wordCount);
-
-	const wordCountEl = document.getElementById('num-words');
-	if (!wordCountEl) {
-		return;
-	}
-
-	addInnerText(wordCountEl, wordCount, clearEls);
-
 	const wordOccurrencesEl = document.getElementById('word-occurrences');
 	if (!wordOccurrencesEl) {
 		return;
 	}
 
-	const wdOccurrences = wordOccurrences(wds, wordCount, wordOccurrencesEl, clearEls);
-	if (!wdOccurrences) {
+	var randomWord = wds[getRandomInt(0, wds.length - 1)];
+
+	var outputText = randomWord;
+
+	const outputNumWordsEl = document.getElementById('output-num-words');
+	if (!outputNumWordsEl) {
 		return;
 	}
 
-	outputTextEl.innerText = '';
+	const outputNumWords = outputNumWordsEl.value || 50;
+
+	for (var i = 0; i < (outputNumWords - 1); i++) {
+		const markovWords = getMarkovWords(wds, randomWord);
+
+		randomWord = markovWords[getRandomInt(0, markovWords.length - 1)];
+
+		outputText += ' ' + randomWord;
+	}
+
+	outputTextEl.value = outputText;
+
+	const enableStatsEl = document.getElementById('enable-stats');
+	if (!enableStatsEl) {
+		return;
+	}
+
+	const enableStats = enableStatsEl.checked;
+
+	if (enableStats) {
+		addInnerText(wordOccurrencesEl, 'Processing stats, please wait...', clearEls);
+
+		wordOccurrences(wds, wordCount, wordOccurrencesEl, clearEls, function () {
+			done.call(context);
+		});
+	}
 
 	return true;
 }
 
-(function() {
-
+(function () {
 	const clearEls = {
 		innerText: [],
 		value: []
 	};
+
+	const outputNumWordsEl = document.getElementById('output-num-words');
+	if (!outputNumWordsEl) {
+		return;
+	}
+
+	outputNumWordsEl.defaultVal = outputNumWordsEl.value || 50;
 
 	const generateButton = document.getElementById('generate-button');
 	if (!generateButton) {
 		return;
 	}
 
-	generateButton.addEventListener('click', function() {
+	generateButton.addEventListener('click', function () {
 		const inputTextEl = document.getElementById('input-text');
 		if (!inputTextEl) {
 			return;
@@ -226,12 +295,40 @@ function markovChain(inputText, outputTextEl, clearEls) {
 			return;
 		}
 
-		const res = markovChain(inputText, outputTextEl, clearEls);
-		if (!res) {
-			return;
-		}
+		markovChain(inputText, outputTextEl, clearEls, function () {
+			console.log('!!!!!! DONE !!!!!!!!');
+		});
 
-		console.log('!!!!!! DONE !!!!!!!!');
+	});
+
+	const bookButton = document.getElementById('book-button');
+	if (!bookButton) {
+		return;
+	}
+
+	bookButton.addEventListener('click', function () {
+		const textDir = 'text/';
+		const book = 'alices-adventures-in-wonderland-by-lewis-carroll-gutenberg.txt';
+		const path = textDir + book;
+
+		fetch(path)
+			.then(function (res) {
+				return res.text();
+			})
+			.then(function (res) {
+				const inputTextEl = document.getElementById('input-text');
+				if (!inputTextEl) {
+					return;
+				}
+
+				inputTextEl.value = res;
+			})
+			.catch(function (err) {
+				console.log('error: Failed fetching book: ' + path);
+				console.log('error:');
+				console.log(err);
+				return err;
+			});
 	});
 
 	const clearButton = document.getElementById('clear-button');
@@ -239,13 +336,27 @@ function markovChain(inputText, outputTextEl, clearEls) {
 		return;
 	}
 
-	clearButton.addEventListener('click', function() {
+	clearButton.addEventListener('click', function () {
 		const inputTextEl = document.getElementById('input-text');
 		if (!inputTextEl) {
 			return;
 		}
 
 		inputTextEl.value = '';
+
+		const outputNumWordsEl = document.getElementById('output-num-words');
+		if (!outputNumWordsEl) {
+			return;
+		}
+
+		outputNumWordsEl.value = outputNumWordsEl.defaultVal || 50;
+
+		const enableStatsEl = document.getElementById('enable-stats');
+		if (!enableStatsEl) {
+			return;
+		}
+
+		enableStatsEl.checked = false;
 
 		const outputTextEl = document.getElementById('output-text');
 		if (!outputTextEl) {
