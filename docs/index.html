@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Markov Chain</title>
+	</head>
+
+	<body>
+		<h1>Markov Chain</h1>
+
+		<div>
+			<h3>Input Text:</h3>
+			<p><textarea id="input-text" style="width: 50%; height: 10em;"></textarea></p>
+		</div>
+
+		<div>
+			<p>
+				<button id="generate-button">Generate</button> &nbsp;
+				<button id="clear-button">Clear</button>
+			</p>
+		</div>
+
+		<div>
+			<h3>Output Text:</h3>
+			<p><textarea id="output-text" style="width: 50%; height: 10em;" readonly></textarea></p>
+		</div>
+
+		<div>
+
+			<h3>Stats:</h3>
+
+			<p>
+				<h4 style="display: inline-block; margin: 0px;">Number of words: </h4>
+				<span id="num-words">0</span>
+			</p>
+
+			<p>
+				<h4 style="display: inline-block; margin: 0px;">Number of word occurrences: </h4>
+				<pre id="word-occurrences">{}</pre>
+			</p>
+
+		</div>
+
+		<script src="markov-chain.js"></script>
+	</body>
+</html>
