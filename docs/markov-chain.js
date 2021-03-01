@@ -95,6 +95,50 @@ function addValue(el, val, clearEls) {
 	clearEls.value.push(el);
 }
 
+function getBook(done, context) {
+	context = context || window;
+
+	const books = [
+		'alices-adventures-in-wonderland-by-lewis-carroll-gutenberg.txt',
+		'dracula-by-bram-stoker-gutenberg.txt',
+		'frankenstein-by-mary-wollstonecraft-godwin-shelley-gutenberg.txt',
+		'grimms-fairy-tales-by-the-brothers-grimm-gutenberg.txt',
+		'the-republic-by-plato-gutenberg.txt'
+	];
+
+	const baseURL = 'https://defcronyke.github.io/markov-chain/';
+	const textDir = 'text/';
+
+	const book = books[getRandomInt(0, books.length - 1)];
+
+	const url = baseURL + textDir + book;
+
+	fetch(url)
+		.then(function (res) {
+			return res.text();
+		})
+		.then(function (res) {
+			const inputTextEl = document.getElementById('input-text');
+			if (!inputTextEl) {
+				return;
+			}
+
+			inputTextEl.value = res;
+
+			if (!!done) {
+				done.call(context, url, res);
+			}
+
+			return res;
+		})
+		.catch(function (err) {
+			console.log('error: Failed fetching book: ' + path);
+			console.log('error:');
+			console.log(err);
+			return err;
+		});
+}
+
 function words(inputText) {
 	if (!inputText) {
 		return;
@@ -346,31 +390,9 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 	}
 
 	bookButton.addEventListener('click', function () {
-		const baseURL = 'https://defcronyke.github.io/markov-chain/';
-		const textDir = 'text/';
-		const book = 'alices-adventures-in-wonderland-by-lewis-carroll-gutenberg.txt';
-		const url = baseURL + textDir + book;
-
-		fetch(url)
-			.then(function (res) {
-				return res.text();
-			})
-			.then(function (res) {
-				const inputTextEl = document.getElementById('input-text');
-				if (!inputTextEl) {
-					return;
-				}
-
-				inputTextEl.value = res;
-
-				return res;
-			})
-			.catch(function (err) {
-				console.log('error: Failed fetching book: ' + path);
-				console.log('error:');
-				console.log(err);
-				return err;
-			});
+		getBook(function (url) {
+			console.log('Fetched book: ' + url);
+		});
 	});
 
 	const clearButton = document.getElementById('clear-button');
