@@ -447,6 +447,13 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 
 		inputTextEl.value = '';
 
+		const loadFileEl = document.getElementById('load-file');
+		if (!loadFileEl) {
+			return;
+		}
+
+		loadFileEl.value = '';
+
 		const outputNumWordsEl = document.getElementById('output-num-words');
 		if (!outputNumWordsEl) {
 			return;
