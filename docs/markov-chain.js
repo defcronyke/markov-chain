@@ -330,7 +330,8 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 	}
 
 	// End the last sentence.
-	while (!/[\.\!\?]/g.test(randomWord[randomWord.length - 1])) {
+	while ((!/[\.\!\?]/g.test(randomWord[randomWord.length - 1])) &&
+		(!(/[\"\”]/g.test(randomWord[randomWord.length - 1]) && /[\.\!\?]/g.test(randomWord[randomWord.length - 2])))) {
 		const markovWords = getMarkovWords(wds, randomWord);
 
 		randomWord = markovWords[getRandomInt(0, markovWords.length - 1)];
