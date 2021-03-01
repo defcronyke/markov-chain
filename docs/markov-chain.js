@@ -261,7 +261,7 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 		return;
 	}
 
-	const outputNumWords = outputNumWordsEl.value || 50;
+	const outputNumWords = outputNumWordsEl.value || 10;
 
 	for (var i = 0; i < (outputNumWords - 1); i++) {
 		const markovWords = getMarkovWords(wds, randomWord);
@@ -311,7 +311,7 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 		return;
 	}
 
-	outputNumWordsEl.defaultVal = outputNumWordsEl.value || 50;
+	outputNumWordsEl.defaultVal = outputNumWordsEl.value || 10;
 
 	const generateButton = document.getElementById('generate-button');
 	if (!generateButton) {
@@ -391,7 +391,7 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 			return;
 		}
 
-		outputNumWordsEl.value = outputNumWordsEl.defaultVal || 50;
+		outputNumWordsEl.value = outputNumWordsEl.defaultVal || 10;
 
 		const enableStatsEl = document.getElementById('enable-stats');
 		if (!enableStatsEl) {
