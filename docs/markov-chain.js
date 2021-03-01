@@ -258,11 +258,21 @@ function wordOccurrences(wds, wordCount, wordOccurrencesEl, clearEls, done, cont
 function getMarkovWords(wds, inWord) {
 	const nextWords = wds
 		.filter(function (val, idx, arr) {
-			if (idx === 0) {
-				return val === inWord;
-			}
+			if (typeof inWord === 'string' || myVar instanceof String) {
+				if (idx <= 0) {
+					return val === inWord;
+				}
 
-			return arr[idx - 1] === inWord;
+				return arr[idx - 1] === inWord;
+			} else {
+				for (var i = 0; i < inWord.length; i++) {
+					if (arr[idx - 1 - i] !== inWord[inWord.length - 1 - i]) {
+						return false;
+					}
+				}
+
+				return true
+			}
 		});
 
 	return nextWords || [];
@@ -305,24 +315,68 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 		return;
 	}
 
+	const outputPrecisionEl = document.getElementById('output-precision');
+	if (!outputPrecisionEl) {
+		return;
+	}
+
+	const outputPrecision = outputPrecisionEl.value;
+	if (!outputPrecision) {
+		return;
+	}
+
 	const outputNumWords = outputNumWordsEl.value || 10;
 
+	var nextWord = randomWord;
+
+	const outputArr = [];
+
 	for (var i = 0; i < (outputNumWords - 1); i++) {
+		if (outputPrecision > 1) {
+			randomWord = [];
+
+			for (var j = outputPrecision; j >= 0; j--) {
+				if (j < outputArr.length - 1) {
+					randomWord.push(outputArr[outputArr.length - 1 - j]);
+				}
+			}
+
+			console.log('precision words:');
+			console.log(randomWord);
+		}
+
 		const markovWords = getMarkovWords(wds, randomWord);
 
-		randomWord = markovWords[getRandomInt(0, markovWords.length - 1)];
+		nextWord = markovWords[getRandomInt(0, markovWords.length - 1)];
 
-		outputText += ' ' + randomWord;
+		outputArr.push(nextWord);
+		// outputText += ' ' + nextWord;
 	}
+
+	// outputText = outputArr.join(' ');
 
 	// End the last sentence.
 	while (!/[\.\!\?]/g.test(randomWord[randomWord.length - 1])) {
+		if (outputPrecision > 1) {
+			randomWord = [];
+
+			for (var j = outputPrecision; j >= 0; j--) {
+				randomWord.push(outputArr[outputArr.length - 1 - j]);
+			}
+
+			console.log('precision words:');
+			console.log(randomWord);
+		}
+
 		const markovWords = getMarkovWords(wds, randomWord);
 
-		randomWord = markovWords[getRandomInt(0, markovWords.length - 1)];
+		nextWord = markovWords[getRandomInt(0, markovWords.length - 1)];
 
-		outputText += ' ' + randomWord;
+		outputArr.push(nextWord);
+		// outputText += ' ' + nextWord;
 	}
+
+	outputText = outputArr.join(' ');
 
 	outputTextEl.value = outputText;
 
