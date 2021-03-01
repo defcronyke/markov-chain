@@ -95,8 +95,9 @@ function addValue(el, val, clearEls) {
 	clearEls.value.push(el);
 }
 
-function getBook(done, context) {
+function getBook(done, lastIdx, context) {
 	context = context || window;
+	lastIdx = lastIdx || -1;
 
 	const books = [
 		'alices-adventures-in-wonderland-by-lewis-carroll-gutenberg.txt',
@@ -109,7 +110,24 @@ function getBook(done, context) {
 	const baseURL = 'https://defcronyke.github.io/markov-chain/';
 	const textDir = 'text/';
 
-	const book = books[getRandomInt(0, books.length - 1)];
+	const inputTextEl = document.getElementById('input-text');
+	if (!inputTextEl) {
+		return;
+	}
+
+	inputTextEl.readonly = true;
+	inputTextEl.value = 'Loading a free book, please wait...';
+
+	var randomIdx = getRandomInt(0, books.length - 1);
+
+	if (lastIdx !== -1) {
+		while (randomIdx === lastIdx) {
+			console.log('Selected the same book as last time, and we don\'t want that. Trying again...');
+			randomIdx = getRandomInt(0, books.length - 1);
+		}
+	}
+
+	const book = books[randomIdx];
 
 	const url = baseURL + textDir + book;
 
@@ -118,15 +136,11 @@ function getBook(done, context) {
 			return res.text();
 		})
 		.then(function (res) {
-			const inputTextEl = document.getElementById('input-text');
-			if (!inputTextEl) {
-				return;
-			}
-
 			inputTextEl.value = res;
+			inputTextEl.readonly = false;
 
 			if (!!done) {
-				done.call(context, url, res);
+				done.call(context, randomIdx, url, res);
 			}
 
 			return res;
@@ -350,6 +364,15 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 		value: []
 	};
 
+	const selectedFileEl = document.getElementById('selected-file');
+	if (!selectedFileEl) {
+		return;
+	}
+
+	if (!('defaultVal' in selectedFileEl)) {
+		selectedFileEl.defaultVal = selectedFileEl.innerText;
+	}
+
 	const loadFileEl = document.getElementById('load-file');
 	if (!loadFileEl) {
 		return;
@@ -358,13 +381,22 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 	loadFileEl.addEventListener('change', function () {
 		var inputText = '';
 
+		const selectedFileEl = document.getElementById('selected-file');
+		if (!selectedFileEl) {
+			return;
+		}
+
+		console.log(loadFileEl.files[0]);
+
+		selectedFileEl.innerText = loadFileEl.files.length === 1 ? loadFileEl.files[0].name : loadFileEl.files.length + ' files';
+
 		const inputTextEl = document.getElementById('input-text');
 		if (!inputTextEl) {
 			return;
 		}
 
 		inputTextEl.readonly = true;
-		inputTextEl.value = 'Loading files. Please wait...';
+		inputTextEl.value = 'Loading files, please wait...';
 
 		var first = true;
 
@@ -428,10 +460,13 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 		return;
 	}
 
+	var bookIdx = -1;
+
 	bookButton.addEventListener('click', function () {
-		getBook(function (url) {
-			console.log('Fetched book: ' + url);
-		});
+		getBook(function (lastIdx, url) {
+			console.log('Fetched book: ' + lastIdx + ': ' + url);
+			bookIdx = lastIdx;
+		}, bookIdx);
 	});
 
 	const clearButton = document.getElementById('clear-button');
@@ -446,6 +481,13 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 		}
 
 		inputTextEl.value = '';
+
+		const selectedFileEl = document.getElementById('selected-file');
+		if (!selectedFileEl) {
+			return;
+		}
+
+		selectedFileEl.innerText = selectedFileEl.defaultVal || 'No file chosen';
 
 		const loadFileEl = document.getElementById('load-file');
 		if (!loadFileEl) {

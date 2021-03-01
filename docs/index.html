@@ -22,7 +22,13 @@
 		</div>
 
 		<div>
-			<input type="file" id="load-file" accept="text/plain" multiple="true">
+			<label for="load-file" style="display: inline-block; padding: 0.3em; border: 1px black solid; margin: 0.5em 0em 0em 0em;">
+				Choose Files
+			</label>
+			<input type="file" id="load-file" accept="text/plain" multiple="true" style="display: none;">
+			<span id="selected-file" style="margin-left: 0.5em;">No file chosen</span><br><br>
+
+			<button id="book-button" style="padding: 0.4em;">Use a Free Book</button>
 		</div>
 
 		<div>
@@ -34,8 +40,8 @@
 			<h4 style="display: inline-block;"><label for="enable-stats">Enable Stats: </label></h4>
 			<input type="checkbox" id="enable-stats" style="position:relative; width: 2em; height: 2em; margin: 1em; top: 0.5em;" min="1" value="50"><br>
 			<button id="generate-button" style="padding: 1em;">Generate</button> &nbsp;
-			<button id="clear-button" style="padding: 1em;">Clear</button><br><br>
-			<button id="book-button" style="padding: 1em;">Use a Free Book</button>
+			<button id="clear-button" style="padding: 1em;">Clear</button>
+
 		</div>
 
 		<div>
