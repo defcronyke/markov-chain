@@ -363,7 +363,7 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 			return;
 		}
 
-		inputTextEl.value = '';
+		inputTextEl.value = 'Loading files. Please wait...';
 
 		for (var i = 0; i < loadFileEl.files.length; i++) {
 			const file = loadFileEl.files[i];
