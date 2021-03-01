@@ -350,6 +350,36 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 		value: []
 	};
 
+	const loadFileEl = document.getElementById('load-file');
+	if (!loadFileEl) {
+		return;
+	}
+
+	loadFileEl.addEventListener('change', function () {
+		var inputText = '';
+
+		const inputTextEl = document.getElementById('input-text');
+		if (!inputTextEl) {
+			return;
+		}
+
+		inputTextEl.value = '';
+
+		for (var i = 0; i < loadFileEl.files.length; i++) {
+			const file = loadFileEl.files[i];
+
+			const reader = new FileReader();
+
+			reader.addEventListener('load', function (e) {
+				const res = e.target.result;
+
+				inputTextEl.value += res + '\n\n';
+			});
+
+			reader.readAsText(file);
+		}
+	});
+
 	const outputNumWordsEl = document.getElementById('output-num-words');
 	if (!outputNumWordsEl) {
 		return;
