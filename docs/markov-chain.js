@@ -334,6 +334,26 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 
 		randomWord = markovWords[getRandomInt(0, markovWords.length - 1)];
 
+		if (/[\.\!\?]/g.test(outputText[outputText.length - 1]) ||
+			(/[\"\”]/g.test(outputText[outputText.length - 1] && /[\.\!\?]/g.test(outputText[outputText.length - 2])))) {
+
+			const maxFails = 100;
+			var failCount = 0;
+			while (!(/[A-Z]|[\"\“]/g.test(randomWord[0]))) {
+				randomWord = markovWords[getRandomInt(0, markovWords.length - 1)];
+
+				if (!(/[A-Z]|[\"\“]/g.test(randomWord[0]))) {
+					failCount++;
+
+					if (failCount >= maxFails) {
+						console.log('Failed to find a Markov starting word after ' + maxFails + ' tries. Using some other word instead.');
+						randomWord = randomWord[0].toUpperCase() + randomWord.substring(1, randomWord.length);
+						break;
+					}
+				}
+			}
+		}
+
 		outputText += ' ' + randomWord;
 	}
 
