@@ -478,4 +478,14 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 		clear(clearEls);
 	});
 
+	const outputTextEl = document.getElementById('output-text');
+	if (!outputTextEl) {
+		return;
+	}
+
+	outputTextEl.addEventListener('click', function () {
+		outputTextEl.select();
+		document.execCommand('copy');
+	});
+
 })();
