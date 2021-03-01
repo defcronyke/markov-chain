@@ -359,7 +359,34 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 	return true;
 }
 
+function removeUnwantedQueryParams(unwantedQueryParams) {
+	if (!('URLSearchParams' in window)) {
+		return;
+	}
+
+	unwantedQueryParams = unwantedQueryParams || [];
+
+	var searchParams = new URLSearchParams(window.location.search);
+
+	for (var i in unwantedQueryParams) {
+		const unwantedQueryParam = unwantedQueryParams[i];
+
+		if (!!searchParams.get(unwantedQueryParam)) {
+			searchParams.delete(unwantedQueryParam);
+		}
+	}
+
+	const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
+	history.replaceState(null, '', newRelativePathQuery);
+}
+
 (function () {
+	const unwantedQueryParams = [
+		'fbclid'
+	];
+
+	removeUnwantedQueryParams(unwantedQueryParams);
+
 	const clearEls = {
 		innerText: [],
 		value: []
