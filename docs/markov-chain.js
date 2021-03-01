@@ -365,12 +365,19 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 
 		inputTextEl.value = 'Loading files. Please wait...';
 
+		var first = true;
+
 		for (var i = 0; i < loadFileEl.files.length; i++) {
 			const file = loadFileEl.files[i];
 
 			const reader = new FileReader();
 
 			reader.addEventListener('load', function (e) {
+				if (first === true) {
+					inputTextEl.value = '';
+					first = false;
+				}
+
 				const res = e.target.result;
 
 				inputTextEl.value += res + '\n\n';
