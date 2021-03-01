@@ -391,6 +391,31 @@ function removeUnwantedQueryParams(unwantedQueryParams) {
 	}
 }
 
+function processQueryParams(clearEls) {
+	if (!('URLSearchParams' in window)) {
+		return false;
+	}
+
+	clearEls = clearEls || {
+		innerText: [],
+		value: []
+	};
+
+	var searchParams = new URLSearchParams(window.location.search);
+
+	const inputText = searchParams.get('in');
+
+	if (!inputText) {
+		return false;
+	}
+
+	markovChain(inputText, document.body, clearEls, function () {
+		console.log('!!!!!! DONE !!!!!!!!');
+	});
+
+	return true;
+}
+
 (function () {
 	const unwantedQueryParams = [
 		'fbclid'
@@ -402,6 +427,10 @@ function removeUnwantedQueryParams(unwantedQueryParams) {
 		innerText: [],
 		value: []
 	};
+
+	if (processQueryParams(clearEls)) {
+		return;
+	}
 
 	const selectedFileEl = document.getElementById('selected-file');
 	if (!selectedFileEl) {
