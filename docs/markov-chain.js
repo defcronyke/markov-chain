@@ -179,17 +179,12 @@ function startingWords(wds) {
 		return /[A-Z]/g.test(val[0]);
 	});
 
-	return arr;
-}
+	if (arr.length === 0) {
+		var first = wds[getRandomInt(0, wds.length - 1)];
+		first = first[0].toUpperCase() + first.substring(1, first.length);
 
-function endingWords(wds) {
-	if (!wds) {
-		return;
+		return [first];
 	}
-
-	const arr = wds.filter(function (val) {
-		return /\.\!\?/g.test(val[val.length - 1]);
-	});
 
 	return arr;
 }
@@ -279,7 +274,12 @@ function getMarkovWords(wds, inWord) {
 			return arr[idx - 1] === inWord;
 		});
 
-	return nextWords || [];
+	if (nextWords.length === 0) {
+		var first = wds[getRandomInt(0, wds.length - 1)];
+		return [first];
+	}
+
+	return nextWords;
 }
 
 function markovChain(inputText, outputTextEl, clearEls, done, context) {
@@ -294,10 +294,16 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 		return;
 	}
 
+	// console.log('words:');
+	// console.log(wds);
+
 	const startingWds = startingWords(wds) || [wds[getRandomInt(0, wds.length - 1)]];
 	if (!startingWds) {
 		return;
 	}
+
+	// console.log('starting words:');
+	// console.log(startingWds);
 
 	const wordCount = wds.length;
 	if (!wordCount) {
@@ -311,6 +317,8 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 
 	// Start a sentence.
 	var randomWord = startingWds[getRandomInt(0, startingWds.length - 1)];
+
+	// console.log('random starting word: ' + randomWord);
 
 	var outputText = randomWord;
 
@@ -329,17 +337,33 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 		outputText += ' ' + randomWord;
 	}
 
+	// console.log('random word: ' + randomWord);
+
 	// End the last sentence.
+	const maxFails = outputNumWords;
+	var failCount = 0;
 	while ((!/[\.\!\?]/g.test(randomWord[randomWord.length - 1])) &&
 		(!(/[\"\”]/g.test(randomWord[randomWord.length - 1]) && /[\.\!\?]/g.test(randomWord[randomWord.length - 2])))) {
+
 		const markovWords = getMarkovWords(wds, randomWord);
 
 		randomWord = markovWords[getRandomInt(0, markovWords.length - 1)];
 
+		if (failCount >= maxFails) {
+			console.log('Failed to find a Markov ending after ' + maxFails + ' tries. Ending output anyway.');
+			randomWord += '.';
+		}
+
 		outputText += ' ' + randomWord;
+
+		failCount++;
 	}
 
-	outputTextEl.value = outputText;
+	if ('value' in outputTextEl) {
+		outputTextEl.value = outputText;
+	} else {
+		outputTextEl.innerText = outputText;
+	}
 
 	const enableStatsEl = document.getElementById('enable-stats');
 	if (!enableStatsEl) {
@@ -407,6 +431,17 @@ function processQueryParams(clearEls) {
 
 	if (!inputText) {
 		return false;
+	}
+
+	const outputNumWords = searchParams.get('words');
+
+	if (outputNumWords) {
+		const outputNumWordsEl = document.getElementById('output-num-words');
+		if (!outputNumWordsEl) {
+			return;
+		}
+
+		outputNumWordsEl.value = outputNumWords;
 	}
 
 	markovChain(inputText, document.body, clearEls, function () {
