@@ -340,7 +340,7 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 	// console.log('random word: ' + randomWord);
 
 	// End the last sentence.
-	const maxFails = outputNumWords;
+	const maxFails = outputNumWords * 3;
 	var failCount = 0;
 	while ((!/[\.\!\?]/g.test(randomWord[randomWord.length - 1])) &&
 		(!(/[\"\”]/g.test(randomWord[randomWord.length - 1]) && /[\.\!\?]/g.test(randomWord[randomWord.length - 2])))) {
@@ -349,14 +349,17 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 
 		randomWord = markovWords[getRandomInt(0, markovWords.length - 1)];
 
-		if (failCount >= maxFails) {
-			console.log('Failed to find a Markov ending after ' + maxFails + ' tries. Ending output anyway.');
-			randomWord += '.';
+		if ((!/[\.\!\?]/g.test(randomWord[randomWord.length - 1])) &&
+			(!(/[\"\”]/g.test(randomWord[randomWord.length - 1]) && /[\.\!\?]/g.test(randomWord[randomWord.length - 2])))) {
+			failCount++;
+
+			if (failCount >= maxFails) {
+				console.log('Failed to find a Markov ending after ' + maxFails + ' tries. Ending output anyway.');
+				randomWord += '.';
+			}
 		}
 
 		outputText += ' ' + randomWord;
-
-		failCount++;
 	}
 
 	if ('value' in outputTextEl) {
