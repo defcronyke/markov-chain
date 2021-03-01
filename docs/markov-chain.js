@@ -368,16 +368,27 @@ function removeUnwantedQueryParams(unwantedQueryParams) {
 
 	var searchParams = new URLSearchParams(window.location.search);
 
+	var modified = false;
+
 	for (var i in unwantedQueryParams) {
 		const unwantedQueryParam = unwantedQueryParams[i];
 
 		if (!!searchParams.get(unwantedQueryParam)) {
 			searchParams.delete(unwantedQueryParam);
+			modified = true;
 		}
 	}
 
-	const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
-	history.replaceState(null, '', newRelativePathQuery);
+	if (modified) {
+		var newRelativePathQuery = window.location.pathname;
+		const searchParamsStr = searchParams.toString();
+
+		if (searchParamsStr !== '') {
+			newRelativePathQuery += '?' + searchParamsStr;
+		}
+
+		history.replaceState(null, '', newRelativePathQuery);
+	}
 }
 
 (function () {
