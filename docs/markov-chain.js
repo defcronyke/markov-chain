@@ -363,6 +363,7 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 			return;
 		}
 
+		inputTextEl.readonly = true;
 		inputTextEl.value = 'Loading files. Please wait...';
 
 		var first = true;
@@ -376,6 +377,7 @@ function markovChain(inputText, outputTextEl, clearEls, done, context) {
 				if (first === true) {
 					inputTextEl.value = '';
 					first = false;
+					inputTextEl.readonly = false;
 				}
 
 				const res = e.target.result;
