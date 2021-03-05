@@ -9,4 +9,4 @@ pages:
     - docs
     expire_in: 90 days
   only:
-  - master
+  - main
