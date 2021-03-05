@@ -107,7 +107,7 @@ function getBook(done, lastIdx, context) {
 		'the-republic-by-plato-gutenberg.txt'
 	];
 
-	const baseURL = 'markov-chain/';
+	const baseURL = '';
 	const textDir = 'text/';
 
 	const inputTextEl = document.getElementById('input-text');
