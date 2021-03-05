@@ -107,7 +107,7 @@ function getBook(done, lastIdx, context) {
 		'the-republic-by-plato-gutenberg.txt'
 	];
 
-	const baseURL = 'https://defcronyke.github.io/markov-chain/';
+	const baseURL = 'markov-chain/';
 	const textDir = 'text/';
 
 	const inputTextEl = document.getElementById('input-text');

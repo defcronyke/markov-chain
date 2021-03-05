@@ -7,3 +7,4 @@
 # git config core.hooksPath .githooks
 
 mkdir -p public; cp -r docs/* public/
+git add public/
