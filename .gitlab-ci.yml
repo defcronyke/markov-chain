@@ -6,7 +6,7 @@ pages:
   - echo 'Nothing to do...'
   artifacts:
     paths:
-    - docs
+    - public
     expire_in: 90 days
   only:
   - main
