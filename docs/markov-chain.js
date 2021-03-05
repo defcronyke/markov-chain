@@ -490,6 +490,29 @@ function processQueryParams(clearEls) {
 		return;
 	}
 
+	const linuxCommandEl = document.getElementById('linux-command');
+	if (!linuxCommandEl) {
+		return;
+	}
+
+	linuxCommandEl.addEventListener('click', function () {
+		const linuxCommandAreaEl = document.getElementById('linux-command-area');
+		if (!linuxCommandAreaEl) {
+			return;
+		}
+
+		linuxCommandAreaEl.style.display = 'block';
+
+		linuxCommandAreaEl.value = linuxCommandEl.innerText;
+
+		linuxCommandAreaEl.select();
+		document.execCommand('copy');
+
+		linuxCommandAreaEl.value = '';
+
+		linuxCommandAreaEl.style.display = 'none';
+	});
+
 	const selectedFileEl = document.getElementById('selected-file');
 	if (!selectedFileEl) {
 		return;
